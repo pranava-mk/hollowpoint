@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hollow Point : Gunshot Localization System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span class="neon-red">Hollow Point</span> - Gunshot Localization System</h1>
+
+        </header>
+        <main>
+            <div class="simulation-area">
+                <canvas id="simulationCanvas" width="800" height="600"></canvas>
+            </div>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <button id="randomGunshot" class="military-button">Generate Gunshot</button>
+                    <button id="predict" class="military-button">Predict Location</button>
+                </div>
+                <div class="control-group">
+                    <label for="windSpeed">Wind Speed: <span id="windSpeedValue">0 m/s</span></label>
+                    <input type="range" id="windSpeed" min="0" max="20" step="0.1" value="0">
+                </div>
+                <div class="control-group">
+                    <label for="windDirection">Wind Direction: <span id="windDirectionValue">0°</span></label>
+                    <input type="range" id="windDirection" min="0" max="360" step="1" value="0">
+                </div>
+                <div class="control-group checkboxes">
+                    <label><input type="checkbox" id="obstacle1"> Bunker</label>
+                    <label><input type="checkbox" id="obstacle2"> Wall</label>
+                    <label><input type="checkbox" id="obstacle3"> Vehicle</label>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <div class="info-panel">
+                <p id="actualLocation">Actual Location: N/A</p>
+                <p id="predictedLocation">Predicted Location: N/A</p>
+                <p id="error">Error: N/A</p>
+            </div>
+        </footer>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.4.4/math.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

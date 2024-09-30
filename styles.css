@@ -1,0 +1,128 @@
+body {
+    font-family: 'Roboto Mono', monospace;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background: url('camo.png') no-repeat center center fixed;
+    background-size: cover;
+    color: #00ff00;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2.5em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    padding: 20px 0;
+    text-shadow: 0 0 10px #00ff00;
+}
+
+main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.simulation-area {
+    flex: 1;
+    margin-right: 20px;
+}
+
+canvas {
+    border: 2px solid #00ff00;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.controls-panel {
+    flex: 0 0 300px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border: 1px solid #00ff00;
+}
+
+.control-group {
+    margin-bottom: 20px;
+}
+
+.military-button {
+    background-color: #004d00;
+    color: #00ff00;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.military-button:hover {
+    background-color: #006700;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="range"] {
+    width: 100%;
+    background-color: #004d00;
+    -webkit-appearance: none;
+    height: 10px;
+    border-radius: 5px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #00ff00;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.checkboxes label {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+footer {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #00ff00;
+}
+
+.info-panel p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.neon-red {
+    color: #000000;  /* Bright red */
+    text-shadow: 
+      0 0 5px #ff073a,   /* Outer glow */
+      0 0 10px #ff073a,  /* Second layer of glow */
+      0 0 20px #ff073a,  /* More intensity */
+      0 0 40px #ff073a, 
+      0 0 80px #ff073a;
+  }
+  
