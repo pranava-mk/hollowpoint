@@ -17,20 +17,78 @@ let obstacles = [];
 let actualLocation = null;
 let predictedLocation = null;
 
+// function drawSimulation() {
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//     // Draw origin
+//     ctx.fillStyle = 'green';
+//     ctx.beginPath();
+//     ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, 2 * Math.PI);
+//     ctx.fill();
+
+//     // Draw microphones
+//     ctx.fillStyle = 'red';
+//     micPositions.forEach(pos => {
+//         ctx.beginPath();
+//         ctx.arc(canvas.width / 2 + pos[0] * 10, canvas.height / 2 - pos[1] * 10, 3, 0, 2 * Math.PI);
+//         ctx.fill();
+//     });
+
+//     // Draw obstacles
+//     ctx.strokeStyle = 'gray';
+//     obstacles.forEach(obstacle => {
+//         ctx.strokeRect(
+//             canvas.width / 2 + obstacle.x * 10,
+//             canvas.height / 2 - obstacle.y * 10,
+//             obstacle.width * 10,
+//             -obstacle.height * 10
+//         );
+//     });
+
+//     // Draw actual location
+//     if (actualLocation) {
+//         ctx.fillStyle = 'blue';
+//         ctx.beginPath();
+//         ctx.arc(canvas.width / 2 + actualLocation[0] * 10, canvas.height / 2 - actualLocation[1] * 10, 5, 0, 2 * Math.PI);
+//         ctx.fill();
+//     }
+
+//     // Draw predicted location
+//     if (predictedLocation) {
+//         ctx.fillStyle = 'purple';
+//         ctx.beginPath();
+//         ctx.arc(canvas.width / 2 + predictedLocation[0] * 10, canvas.height / 2 - predictedLocation[1] * 10, 5, 0, 2 * Math.PI);
+//         ctx.fill();
+//     }
+
+//     // Draw wind arrow
+//     ctx.strokeStyle = 'cyan';
+//     ctx.beginPath();
+//     ctx.moveTo(canvas.width / 2, canvas.height / 2);
+//     ctx.lineTo(
+//         canvas.width / 2 + windSpeed * Math.cos(windDirection) * 10,
+//         canvas.height / 2 - windSpeed * Math.sin(windDirection) * 10
+//     );
+//     ctx.stroke();
+// }
+
 function drawSimulation() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw origin
-    ctx.fillStyle = 'green';
+    ctx.fillStyle = 'yellow';
     ctx.beginPath();
     ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, 2 * Math.PI);
     ctx.fill();
 
-    // Draw microphones
-    ctx.fillStyle = 'red';
+    // Draw microphones (green triangles)
+    ctx.fillStyle = 'green';
     micPositions.forEach(pos => {
         ctx.beginPath();
-        ctx.arc(canvas.width / 2 + pos[0] * 10, canvas.height / 2 - pos[1] * 10, 3, 0, 2 * Math.PI);
+        ctx.moveTo(canvas.width / 2 + pos[0] * 10, canvas.height / 2 - pos[1] * 10 - 5);
+        ctx.lineTo(canvas.width / 2 + pos[0] * 10 - 5, canvas.height / 2 - pos[1] * 10 + 5);
+        ctx.lineTo(canvas.width / 2 + pos[0] * 10 + 5, canvas.height / 2 - pos[1] * 10 + 5);
+        ctx.closePath();
         ctx.fill();
     });
 
@@ -45,24 +103,22 @@ function drawSimulation() {
         );
     });
 
-    // Draw actual location
+    // Draw actual location (red square)
     if (actualLocation) {
-        ctx.fillStyle = 'blue';
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2 + actualLocation[0] * 10, canvas.height / 2 - actualLocation[1] * 10, 5, 0, 2 * Math.PI);
-        ctx.fill();
+        ctx.fillStyle = 'red';
+        ctx.fillRect(canvas.width / 2 + actualLocation[0] * 10 - 5, canvas.height / 2 - actualLocation[1] * 10 - 5, 10, 10);
     }
 
-    // Draw predicted location
+    // Draw predicted location (purple circle)
     if (predictedLocation) {
-        ctx.fillStyle = 'purple';
+        ctx.fillStyle = 'cyan';
         ctx.beginPath();
         ctx.arc(canvas.width / 2 + predictedLocation[0] * 10, canvas.height / 2 - predictedLocation[1] * 10, 5, 0, 2 * Math.PI);
         ctx.fill();
     }
 
     // Draw wind arrow
-    ctx.strokeStyle = 'cyan';
+    ctx.strokeStyle = 'white';
     ctx.beginPath();
     ctx.moveTo(canvas.width / 2, canvas.height / 2);
     ctx.lineTo(
@@ -70,6 +126,55 @@ function drawSimulation() {
         canvas.height / 2 - windSpeed * Math.sin(windDirection) * 10
     );
     ctx.stroke();
+
+    // Draw legend
+    drawLegend();
+}
+
+function drawLegend() {
+    const legendX = canvas.width - 160;
+    const legendY = 450;
+    const lineHeight = 25;
+
+    ctx.fillStyle = 'rgba(50, 0, 0, 0.7)';
+    ctx.fillRect(legendX - 10, legendY - 20, 160, 150);
+
+    ctx.font = '12px Hack';
+    ctx.fillStyle = 'white';
+    ctx.fillText('Legend:', legendX, legendY);
+
+    // Microphone
+    ctx.fillStyle = 'green';
+    ctx.beginPath();
+    ctx.moveTo(legendX, legendY + lineHeight);
+    ctx.lineTo(legendX - 5, legendY + lineHeight + 10);
+    ctx.lineTo(legendX + 5, legendY + lineHeight + 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('Microphone', legendX + 15, legendY + lineHeight + 5);
+
+    // Actual Location
+    ctx.fillStyle = 'red';
+    ctx.fillRect(legendX - 5, legendY + 2 * lineHeight - 5, 10, 10);
+    ctx.fillStyle = 'white';
+    ctx.fillText('Actual Location', legendX + 15, legendY + 2 * lineHeight + 5);
+
+    // Predicted Location
+    ctx.fillStyle = 'cyan';
+    ctx.beginPath();
+    ctx.arc(legendX, legendY + 3 * lineHeight, 5, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('Predicted Location', legendX + 15, legendY + 3 * lineHeight + 5);
+
+    // Origin
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(legendX, legendY + 4 * lineHeight, 5, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.fillText('Origin', legendX + 15, legendY + 4 * lineHeight + 5);
 }
 
 function generateGunshot(minDistance = 1, maxDistance = 50) {
