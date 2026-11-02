@@ -61,20 +61,24 @@ math did anything. It's now a real multilateration solve.
 
 ## 🚀 Getting Started
 
-Pure static HTML/CSS/JS, no build step:
+Pure static HTML/CSS/JS, no build step, no dependencies — one command:
 
 ```bash
-python3 -m http.server 8000
+curl -fsSL https://raw.githubusercontent.com/pranava-mk/hollowpoint/main/install.sh | bash
 ```
 
-Then open **http://localhost:8000**.
+This clones the repo (if not already present), starts a local static server
+(`python3 -m http.server`, falling back to `npx serve` if Python isn't
+available), and prints the local URL to open (default
+**http://localhost:8000**).
 
 ## 🗂️ Project Structure
 
 ```
 hollowpoint/
-├── index.html    # layout: canvas, control panel, info panel
-├── script.js      # simulation + TDOA multilateration solver
+├── install.sh      # one-command clone + local server launcher
+├── index.html      # layout: canvas, control panel, info panel
+├── script.js       # simulation + TDOA multilateration solver
 ├── styles.css      # military/neon-green terminal aesthetic
 └── camo.png        # background texture
 ```
