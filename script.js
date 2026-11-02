@@ -17,61 +17,6 @@ let obstacles = [];
 let actualLocation = null;
 let predictedLocation = null;
 
-// function drawSimulation() {
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-//     // Draw origin
-//     ctx.fillStyle = 'green';
-//     ctx.beginPath();
-//     ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, 2 * Math.PI);
-//     ctx.fill();
-
-//     // Draw microphones
-//     ctx.fillStyle = 'red';
-//     micPositions.forEach(pos => {
-//         ctx.beginPath();
-//         ctx.arc(canvas.width / 2 + pos[0] * 10, canvas.height / 2 - pos[1] * 10, 3, 0, 2 * Math.PI);
-//         ctx.fill();
-//     });
-
-//     // Draw obstacles
-//     ctx.strokeStyle = 'gray';
-//     obstacles.forEach(obstacle => {
-//         ctx.strokeRect(
-//             canvas.width / 2 + obstacle.x * 10,
-//             canvas.height / 2 - obstacle.y * 10,
-//             obstacle.width * 10,
-//             -obstacle.height * 10
-//         );
-//     });
-
-//     // Draw actual location
-//     if (actualLocation) {
-//         ctx.fillStyle = 'blue';
-//         ctx.beginPath();
-//         ctx.arc(canvas.width / 2 + actualLocation[0] * 10, canvas.height / 2 - actualLocation[1] * 10, 5, 0, 2 * Math.PI);
-//         ctx.fill();
-//     }
-
-//     // Draw predicted location
-//     if (predictedLocation) {
-//         ctx.fillStyle = 'purple';
-//         ctx.beginPath();
-//         ctx.arc(canvas.width / 2 + predictedLocation[0] * 10, canvas.height / 2 - predictedLocation[1] * 10, 5, 0, 2 * Math.PI);
-//         ctx.fill();
-//     }
-
-//     // Draw wind arrow
-//     ctx.strokeStyle = 'cyan';
-//     ctx.beginPath();
-//     ctx.moveTo(canvas.width / 2, canvas.height / 2);
-//     ctx.lineTo(
-//         canvas.width / 2 + windSpeed * Math.cos(windDirection) * 10,
-//         canvas.height / 2 - windSpeed * Math.sin(windDirection) * 10
-//     );
-//     ctx.stroke();
-// }
-
 function drawSimulation() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -227,26 +172,45 @@ function isObstructed(start, end, obstacle) {
         Math.max(start[1], end[1]) >= obstacle.y);
 }
 
-// function predict(timeDelays) {
-//     const sumDelays = timeDelays.reduce((a, b) => a + b, 0);
-//     const avgDelay = sumDelays / timeDelays.length;
-//     return [avgDelay * Math.cos(windDirection) * 100, avgDelay * Math.sin(windDirection) * 100];
-// }
-
+// Real TDOA multilateration (replaces an old placeholder that returned a
+// random point near the known actual location, ignoring timeDelays
+// entirely -- see README for history).
+//
+// Pick the mic with the smallest delay as reference (xr, yr). For every
+// other mic i, the measured range difference Ri = (timeDelays[i] -
+// timeDelays[ref]) * SOUND_SPEED gives one linear equation in the unknown
+// source position (x, y), after expanding and cancelling the x^2+y^2 term:
+//
+//   2*(xi-xr)*x + 2*(yi-yr)*y + 2*Ri*R = (xi^2+yi^2) - (xr^2+yr^2) - Ri^2
+//
+// where R is the (unknown) true range from the source to the reference
+// mic. R itself is also unknown, so this is solved as a 3-unknown
+// least-squares system [x, y, R] over all non-reference mics using
+// math.js (already loaded, previously unused).
 function predict(timeDelays) {
-    // Instead of using the existing prediction logic,
-    // we'll generate a point very close to the actual location
-    if (actualLocation) {
-        const maxError = 50; // Maximum error in meters
-        const errorAngle = Math.random() * 2 * Math.PI;
-        const errorDistance = Math.random() * maxError;
-        
-        return [
-            actualLocation[0] + errorDistance * Math.cos(errorAngle) / 10,
-            actualLocation[1] + errorDistance * Math.sin(errorAngle) / 10
-        ];
+    const refIdx = timeDelays.indexOf(Math.min(...timeDelays));
+    const [xr, yr] = micPositions[refIdx];
+
+    const rows = [];
+    const rhs = [];
+    for (let i = 0; i < micPositions.length; i++) {
+        if (i === refIdx) continue;
+        const [xi, yi] = micPositions[i];
+        const R = (timeDelays[i] - timeDelays[refIdx]) * SOUND_SPEED;
+        rows.push([2 * (xi - xr), 2 * (yi - yr), 2 * R]);
+        rhs.push((xi * xi + yi * yi) - (xr * xr + yr * yr) - R * R);
     }
-    return [0, 0]; // Default prediction if no actual location
+
+    const AtA = math.multiply(math.transpose(rows), rows);
+    const Atb = math.multiply(math.transpose(rows), rhs);
+    try {
+        const solution = math.lusolve(AtA, Atb);
+        return [solution[0][0], solution[1][0]];
+    } catch (e) {
+        // Degenerate mic geometry -- shouldn't happen with the fixed hexagon
+        // array, but fail safe rather than throwing.
+        return [0, 0];
+    }
 }
 
 document.getElementById('randomGunshot').addEventListener('click', () => {
